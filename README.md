@@ -6,9 +6,11 @@ This is a simple human/pet tracking sketch based on pixel diff between two captu
 1 - Choose your mode 
 --------------------
 
-You can set the "coolEffect" variable so as to get the differents level of the process:
+First, you have to set the number of subjects you want to follow by changing the "tiger" variable.
 
-1. Get center of main moving regions
+Next, you can set the "coolEffect" variable so as to get the differents level of the process:
+
+1. Get center of moving targets
 2. Get the detail of moving regions
 3. Get the detail of modified pixels
 4. Remove the image
