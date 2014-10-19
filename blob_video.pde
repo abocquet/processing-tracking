@@ -3,7 +3,6 @@ import java.util.Iterator;
 
 /* CHOOSE YOUR EFFECT 
  
- 0: A simple following dot
  1: Get center of main moving regions
  2: Get the detail of moving regions
  3: Get the detail of modified pixels
@@ -12,19 +11,20 @@ import java.util.Iterator;
  6: Get only modified regions
  
  */
-int coolEffect =  6 ;
+int coolEffect =  1 ;
 
 PImage prev ;
 Capture cam ;
 
 int threshold = 50 ;
 int children_threshold = 10 ;
-int blob_scale = 30 ;
+int blob_scale = 40 ;
+
+int tigers = 1 ;
 
 boolean[][] liste_pixels ;
-UltimateBlob steve ;
 ArrayList<Blob> blobs ;
-ArrayList<MasterBlob> master_blobs ;
+MasterBlob[] master_blobs ;
 
 void setup() {
 
@@ -36,8 +36,11 @@ void setup() {
 
   liste_pixels = new boolean[cam.width][cam.height] ;
   blobs = new ArrayList<Blob>() ;
-  master_blobs = new ArrayList<MasterBlob>() ;
-  steve = new UltimateBlob() ;
+  master_blobs = new MasterBlob[tigers]; 
+  
+  for (int i = 0; i < master_blobs.length; i++) { 
+    master_blobs[i] = new MasterBlob();
+  }
 }
 
 boolean sketchFullScreen() {
@@ -103,57 +106,30 @@ void draw() {
     MasterBlob current = new MasterBlob(blobs.get(0));
 
     if (current.m_blobs.size() > children_threshold) {
-      master_blobs.add(current);
+
+      int closer = 0 ;
+      for (int i = 1; i < master_blobs.length; i++)
+      {
+        if (current.distanceTo(master_blobs[closer]) > current.distanceTo(master_blobs[i])) {
+          closer = i ;
+        }
+      }
+
+      master_blobs[closer] = current;
     }
   }
 
 
   if (coolEffect >= 1)
   {
-    for (int i = 0; i < master_blobs.size (); i ++)
+    for (int i = 0; i < master_blobs.length; i ++)
     {
-      master_blobs.get(i).drawCenter();
+      master_blobs[i].drawCenter();
     }
   }
-
-
-  steve.refresh(master_blobs);
-  steve.draw();
-
-  master_blobs.clear();
-  //saveFrame();
 }
 
-class UltimateBlob {
 
-  float m_x, m_y ;
-
-  void refresh(ArrayList<MasterBlob> masters) {
-
-    if (masters.size() > 0) {
-
-      m_x = 0 ;
-      m_y = 0 ;
-
-      for (int i = 0; i < masters.size (); i++)
-      {
-        Point center = masters.get(i).center() ;
-        m_x += center.m_x ;
-        m_y += center.m_y ;
-      }
-
-      m_x /= masters.size() ;
-      m_y /= masters.size() ;
-    }
-  }
-
-  void draw() {
-
-    noStroke() ;
-    fill(255);
-    ellipse(m_x, m_y, 30, 30);
-  }
-}
 
 class MasterBlob {
 
@@ -163,7 +139,13 @@ class MasterBlob {
     m_blobs = new ArrayList<Blob>() ;
     m_blobs.add(first);
 
-    check();
+    this.fulfill();
+  }
+
+  MasterBlob() {
+
+    m_blobs = new ArrayList<Blob>() ;
+    m_blobs.add(new Blob(0, 0));
   }
 
   Point center() {
@@ -183,7 +165,7 @@ class MasterBlob {
     return new Point(x, y);
   }
 
-  void check() {
+  void fulfill() {
     Iterator<Blob> it = blobs.iterator();
     while (it.hasNext ())
     {
@@ -198,7 +180,7 @@ class MasterBlob {
       if (match) {
         m_blobs.add(current);
         it.remove();
-        check();
+        this.fulfill();
         return ;
       }
     }
@@ -208,7 +190,12 @@ class MasterBlob {
     Point center = center();
     noStroke();
     fill(255, 255, 255);
-    ellipse(center.m_x, center.m_y, 15, 15);
+    ellipse(center.m_x, center.m_y, 25, 25);
+  }
+
+  int distanceTo(MasterBlob other) {
+    Point c1 = this.center(), c2 = other.center();
+    return c2.m_x == 0 && c2.m_y == 0 ? 0 : (int)(pow(c1.m_x - c2.m_x, 2) + pow(c1.m_y - c2.m_y, 2)) ;
   }
 }
 
