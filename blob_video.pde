@@ -11,7 +11,7 @@ import java.util.Iterator;
  6: Get only modified regions
  
  */
-int coolEffect =  1 ;
+int coolEffect =  2 ;
 
 PImage prev ;
 Capture cam ;
@@ -28,7 +28,7 @@ MasterBlob[] master_blobs ;
 
 void setup() {
 
-  cam = new Capture(this, 640, 480, 20);
+  cam = new Capture(this, 640, 480, 60);
   prev = createImage(cam.width, cam.height, RGB);
   size(cam.width, cam.height);
 
@@ -37,7 +37,7 @@ void setup() {
   liste_pixels = new boolean[cam.width][cam.height] ;
   blobs = new ArrayList<Blob>() ;
   master_blobs = new MasterBlob[tigers]; 
-  
+
   for (int i = 0; i < master_blobs.length; i++) { 
     master_blobs[i] = new MasterBlob();
   }
@@ -45,6 +45,13 @@ void setup() {
 
 boolean sketchFullScreen() {
   return false;
+}
+
+void keyPressed() {
+
+  if (keyCode >= 49 && keyCode <= 54) {
+    coolEffect = keyCode - 48 ;
+  }
 }
 
 void draw() {
