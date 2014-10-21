@@ -19,6 +19,7 @@ Capture cam ;
 int threshold = 50 ;
 int children_threshold = 10 ;
 int blob_scale = 40 ;
+int frame_padding = 40 ;
 
 int tigers = 1 ;
 
@@ -73,8 +74,6 @@ void draw() {
   prev.loadPixels();
 
   liste_pixels = diff(cam, prev);
-
-
 
   for (int y = 0; y < liste_pixels[0].length; y++ ) {
     for (int x = 0; x < liste_pixels.length; x++ ) {
@@ -134,6 +133,10 @@ void draw() {
       master_blobs[i].drawCenter();
     }
   }
+
+  noFill();
+  stroke(255, 0, 0);
+  rect(frame_padding, frame_padding, width - 2* frame_padding, height - 2* frame_padding);
 }
 
 
@@ -193,11 +196,20 @@ class MasterBlob {
     }
   }
 
-  void drawCenter() {
+  boolean isIn()
+  {
     Point center = center();
-    noStroke();
-    fill(255, 255, 255);
-    ellipse(center.m_x, center.m_y, 25, 25);
+    return center.m_x >= frame_padding && center.m_x <= cam.width - frame_padding && center.m_y >= frame_padding && center.m_y <= cam.height - frame_padding ;
+  }  
+
+
+  void drawCenter() {
+    if (isIn()) {
+      Point center = center();
+      noStroke();
+      fill(255, 255, 255);
+      ellipse(center.m_x, center.m_y, 25, 25);
+    }
   }
 
   int distanceTo(MasterBlob other) {
